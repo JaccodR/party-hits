@@ -1,2 +1,2 @@
-# Example
-An example greeter plugin
+# ToB Party Hits
+Shows the hits of your teammates in ToB
