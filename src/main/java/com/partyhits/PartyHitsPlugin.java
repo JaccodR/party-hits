@@ -3,8 +3,6 @@ package com.partyhits;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 
-import com.partyhits.XpToDamage.XpToDamage;
-import com.partyhits.util.AttackStyle;
 import com.partyhits.util.Hit;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
@@ -129,16 +127,15 @@ public class PartyHitsPlugin extends Plugin
 			if (player == null)
 				return;
 
-			int npcId = -1;
 			Actor actor = player.getInteracting();
 			if (actor instanceof NPC)
 			{
-				npcId = ((NPC) actor).getId();
+				int npcId = ((NPC) actor).getId();
 
 				int dmg = xpToDamage.calculateHit(npcId, xpDrop);
 				if (dmg > 0)
 				{
-					Hit hit = new Hit(dmg, AttackStyle.MELEE, client.getLocalPlayer().getName());
+					Hit hit = new Hit(dmg, client.getLocalPlayer().getName());
 					sendHit(hit);
 				}
 			}

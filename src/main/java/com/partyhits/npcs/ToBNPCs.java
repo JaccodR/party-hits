@@ -1,4 +1,4 @@
-package com.partyhits.XpToDamage;
+package com.partyhits.npcs;
 
 import net.runelite.api.NpcID;
 import java.util.Arrays;

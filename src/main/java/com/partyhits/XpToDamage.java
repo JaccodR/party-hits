@@ -1,6 +1,7 @@
-package com.partyhits.XpToDamage;
+package com.partyhits;
 
 
+import com.partyhits.npcs.ToBNPCs;
 import net.runelite.api.Client;
 import net.runelite.client.util.Text;
 
