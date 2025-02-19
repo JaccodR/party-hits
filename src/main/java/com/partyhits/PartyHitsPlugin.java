@@ -25,7 +25,7 @@ import java.util.Arrays;
 
 @Slf4j
 @PluginDescriptor(
-	name = "Party Predicted Hit",
+	name = "ToB Party Hits",
 		description = "Shows the hits of your party members above their head in ToB",
 		tags = {"party", "hits", "tob"}
 )
