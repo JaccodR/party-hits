@@ -1,0 +1,90 @@
+package com.partyhits;
+
+import com.partyhits.util.Hit;
+import net.runelite.api.*;
+import net.runelite.api.Point;
+import net.runelite.client.ui.overlay.Overlay;
+import net.runelite.client.ui.overlay.OverlayLayer;
+import net.runelite.client.ui.overlay.OverlayPosition;
+
+import javax.inject.Inject;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+
+public class PartyHitsOverlay extends Overlay
+{
+    private final PartyHitsPlugin plugin;
+    private final PartyHitsConfig config;
+    @Inject
+    private Client client;
+    private final Map<Hit, Integer> hits = new HashMap<>();
+
+    @Inject
+    PartyHitsOverlay(PartyHitsPlugin plugin, PartyHitsConfig config)
+    {
+        setPosition(OverlayPosition.DYNAMIC);
+        setLayer(OverlayLayer.ABOVE_SCENE);
+        this.plugin = plugin;
+        this.config = config;
+    }
+
+    @Override
+    public Dimension render(Graphics2D graphics)
+    {
+        Map<Hit, Integer> updatedHits = new HashMap<>();
+
+        Iterator<Map.Entry<Hit, Integer>> iterator = hits.entrySet().iterator();
+
+        while (iterator.hasNext())
+        {
+            Map.Entry<Hit, Integer> entry = iterator.next();
+            Hit hit = entry.getKey();
+            int duration = entry.getValue();
+            if (duration <= 0)
+            {
+                iterator.remove();
+                continue;
+            }
+            renderHit(graphics, hit);
+            updatedHits.put(hit, duration - 1);
+        }
+        hits.putAll(updatedHits);
+
+        return null;
+    }
+
+    private void renderHit(Graphics2D graphics, Hit hit)
+    {
+        String targetName = hit.getPlayer();
+        Player target = null;
+        for (Player p : client.getTopLevelWorldView().players())
+        {
+            if (Objects.equals(p.getName(), targetName))
+            {
+                target = p;
+            }
+        }
+
+        if (target == null)
+            return;
+
+        String damageText = String.valueOf(hit.getDamage());
+        Point pt = target.getCanvasTextLocation(graphics, damageText, (int) (target.getLogicalHeight() + 60 + (config.offset() * 10)));
+        if (pt != null)
+        {
+            graphics.setFont(new Font(config.font().toString(), Font.BOLD, config.size()));
+            graphics.setColor(config.color());
+            graphics.drawString(damageText, pt.getX(), pt.getY());
+        }
+    }
+
+    public void addHit(Hit hit, int duration)
+    {
+        hits.keySet().removeIf(existingHit -> existingHit.getPlayer().equals(hit.getPlayer())); // if a player still has a hit remove it
+
+        hits.put(hit, duration);
+    }
+}
