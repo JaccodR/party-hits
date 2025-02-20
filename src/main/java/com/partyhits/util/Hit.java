@@ -12,4 +12,5 @@ public class Hit extends PartyMemberMessage
 {
     int damage;
     String player;
+    int tickDelay;
 }

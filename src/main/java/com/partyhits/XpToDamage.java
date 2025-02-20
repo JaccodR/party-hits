@@ -31,7 +31,7 @@ public class XpToDamage
         }
     }
 
-    private int getToBPartySize()
+    public int getToBPartySize()
     {
         int count = 0;
         for (int i = 330; i < 335; i++)

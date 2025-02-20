@@ -76,8 +76,13 @@ public class PartyHitsOverlay extends Overlay
         if (pt != null)
         {
             graphics.setFont(new Font(config.font().toString(), Font.BOLD, config.size()));
+
+            FontMetrics fontMetrics = graphics.getFontMetrics();
+            int x = pt.getX() - (fontMetrics.stringWidth(damageText) / 2) + config.horOffset();
+            int y = pt.getY() - (fontMetrics.getHeight() / 2) - fontMetrics.getDescent();
+
             graphics.setColor(config.color());
-            graphics.drawString(damageText, pt.getX(), pt.getY());
+            graphics.drawString(damageText, x, y);
         }
     }
 

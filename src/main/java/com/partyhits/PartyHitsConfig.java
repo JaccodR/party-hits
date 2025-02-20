@@ -4,17 +4,35 @@ import com.partyhits.util.FontTypes;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
+import net.runelite.client.config.ConfigSection;
 
 import java.awt.*;
 
 @ConfigGroup("partyhits")
 public interface PartyHitsConfig extends Config
 {
+	@ConfigSection(
+			name = "General",
+			position = 0,
+			description = "General Settings",
+			closedByDefault = false
+	)
+	String generalSettings = "generalSettings";
+
+	@ConfigSection(
+			name = "Font",
+			position = 1,
+			description = "Font Options",
+			closedByDefault = true
+	)
+	String fontSettings = "fontSettings";
+
 	@ConfigItem(
 			position = 0,
 			keyName = "Duration",
 			name = "Hitsplat duration",
-			description = "How long should the hitsplat stay for (in frames)."
+			description = "How long should the hitsplat stay for (in frames).",
+			section = generalSettings
 	)
 	default int duration()
 	{
@@ -22,9 +40,10 @@ public interface PartyHitsConfig extends Config
 	}
 	@ConfigItem(
 			position = 1,
-			keyName = "Offset",
-			name = "Hitsplat Offset",
-			description = "Make the hitsplat higher above the player."
+			keyName = "Height Offset",
+			name = "Height Offset",
+			description = "Make the hitsplat higher above the player.",
+			section = fontSettings
 	)
 	default int offset()
 	{
@@ -34,7 +53,8 @@ public interface PartyHitsConfig extends Config
 			position = 2,
 			keyName = "Font",
 			name = "Font",
-			description = "Change the font of the text."
+			description = "Change the font of the text.",
+			section = fontSettings
 	)
 	default FontTypes font()
 	{
@@ -44,7 +64,8 @@ public interface PartyHitsConfig extends Config
 			position = 3,
 			keyName = "Font Size",
 			name = "Font Size",
-			description = "Change the size of the text."
+			description = "Change the size of the text.",
+			section = fontSettings
 	)
 	default int size()
 	{
@@ -54,7 +75,8 @@ public interface PartyHitsConfig extends Config
 			position = 4,
 			keyName = "Text Color",
 			name = "Text Color",
-			description = "Change the color of the text."
+			description = "Change the color of the text.",
+			section = fontSettings
 	)
 	default Color color()
 	{
@@ -64,9 +86,54 @@ public interface PartyHitsConfig extends Config
 			position = 5,
 			keyName = "Maiden only",
 			name = "Maiden only",
-			description = "Only show in the maiden room."
+			description = "Only show in the maiden room.",
+			section = generalSettings
 	)
 	default boolean maidenOnly()
+	{
+		return false;
+	}
+	@ConfigItem(
+			position = 6,
+			keyName = "Show self",
+			name = "Show self",
+			description = "Show your own hits.",
+			section = generalSettings
+	)
+	default boolean ownHits()
+	{
+		return false;
+	}
+	@ConfigItem(
+			position = 7,
+			keyName = "Show party hits",
+			name = "Show party hits",
+			description = "Show the hits of your party members.",
+			section = generalSettings
+	)
+	default boolean partyHits()
+	{
+		return true;
+	}
+	@ConfigItem(
+			position = 8,
+			keyName = "Horizontal Offset",
+			name = "Horizontal Offset",
+			description = "Adjust the horizontal offset of the text.",
+			section = fontSettings
+	)
+	default int horOffset()
+	{
+		return 4;
+	}
+	@ConfigItem(
+			position = 9,
+			keyName = "Maiden live HP",
+			name = "Maiden Live HP",
+			description = "Shows maidens current hp.",
+			section = generalSettings
+	)
+	default boolean maidenHP()
 	{
 		return false;
 	}
