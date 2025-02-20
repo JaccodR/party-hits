@@ -1,7 +1,6 @@
 package com.partyhits.maiden;
 
 import com.partyhits.PartyHitsConfig;
-import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
 import net.runelite.api.Point;
@@ -18,8 +17,6 @@ public class MaidenOverlay extends Overlay
     private Client client;
     private final PartyHitsConfig config;
     private final MaidenHandler maidenHandler;
-    private double lastHp;
-    private int updateDelay;
 
     @Inject
     public MaidenOverlay(MaidenHandler maidenHandler, PartyHitsConfig config)
@@ -28,8 +25,6 @@ public class MaidenOverlay extends Overlay
         setLayer(OverlayLayer.ABOVE_SCENE);
         this.maidenHandler = maidenHandler;
         this.config = config;
-        lastHp = 100.0;
-        updateDelay = 0;
     }
 
     @Override
@@ -43,14 +38,7 @@ public class MaidenOverlay extends Overlay
                 maidenHp = 0;
 
 
-            if (updateDelay != 0)
-            {
-                maidenHp = lastHp;
-                updateDelay--;
-            }
-
             String hpText = String.format("%.1f", maidenHp);
-            lastHp = maidenHp;
 
             Point pt = maiden.getCanvasTextLocation(graphics, hpText,config.maidenOffset() * 5);
             if (pt != null)
@@ -81,10 +69,5 @@ public class MaidenOverlay extends Overlay
             }
         }
         return null;
-    }
-
-    public void updateHpOverlay()
-    {
-        updateDelay = 5; // anti flicker solution for now...
     }
 }

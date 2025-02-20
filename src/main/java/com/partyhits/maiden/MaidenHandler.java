@@ -72,9 +72,8 @@ public class MaidenHandler
     {
         if (maidenActive)
         {
-            reduceQueuedDamage();
             updatePredictedHp();
-            maidenOverlay.updateHpOverlay();
+            reduceQueuedDamage();
         }
     }
 
@@ -123,6 +122,5 @@ public class MaidenHandler
     {
         queuedDamage.put(hit.getDamage(), hit.getTickDelay());
         updatePredictedHp();
-        maidenOverlay.updateHpOverlay();
     }
 }
