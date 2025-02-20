@@ -32,7 +32,6 @@ public class MaidenHandler
 
     public void init(NPC maiden)
     {
-        System.out.println("Maiden Handler active.");
         overlayManager.add(maidenOverlay);
         queuedDamage.clear();
         maidenActive = true;
@@ -60,7 +59,6 @@ public class MaidenHandler
 
     public void deactivate()
     {
-        System.out.println("Maiden Handler deactive.");
         overlayManager.remove(maidenOverlay);
         maidenActive = false;
         queuedDamage.clear();
