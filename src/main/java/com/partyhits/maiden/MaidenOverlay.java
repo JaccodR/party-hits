@@ -1,5 +1,6 @@
 package com.partyhits.maiden;
 
+import com.partyhits.PartyHitsConfig;
 import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.NPC;
@@ -15,20 +16,19 @@ public class MaidenOverlay extends Overlay
 {
     @Inject
     private Client client;
+    private final PartyHitsConfig config;
     private final MaidenHandler maidenHandler;
     private double lastHp;
-    @Setter
-    private boolean shouldUpdate;
     private int updateDelay;
 
     @Inject
-    public MaidenOverlay(MaidenHandler maidenHandler)
+    public MaidenOverlay(MaidenHandler maidenHandler, PartyHitsConfig config)
     {
         setPosition(OverlayPosition.DYNAMIC);
         setLayer(OverlayLayer.ABOVE_SCENE);
         this.maidenHandler = maidenHandler;
+        this.config = config;
         lastHp = 100.0;
-        shouldUpdate = true;
         updateDelay = 0;
     }
 
@@ -52,14 +52,32 @@ public class MaidenOverlay extends Overlay
             String hpText = String.format("%.1f", maidenHp);
             lastHp = maidenHp;
 
-            Point pt = maiden.getCanvasTextLocation(graphics, hpText,25); // add z offset
+            Point pt = maiden.getCanvasTextLocation(graphics, hpText,config.maidenOffset() * 5);
             if (pt != null)
             {
-                graphics.setFont(new Font("Arial", Font.BOLD, 20)); // add font options
+                graphics.setFont(new Font(config.maidenFont().getName(), Font.BOLD, config.maidenSize()));
 
-                graphics.setColor(Color.GREEN); // add different color options based on hp % thresholds
+                graphics.setColor(config.maidenColor());
+                if (config.threshColor())
+                {
+                    if (maidenHp < 30.0)
+                    {
+                        graphics.setColor(config.maidenThirty());
+                    }
+                    else if (maidenHp < 50.0)
+                    {
+                        graphics.setColor(config.maidenFifty());
+                    }
+                    else if (maidenHp < 70.0)
+                    {
+                        graphics.setColor(config.maidenSeventy());
+                    }
+                }
+                FontMetrics fontMetrics = graphics.getFontMetrics();
+                int x = pt.getX() - (fontMetrics.stringWidth(hpText) / 2) + config.maidenHorOffset();
+                int y = pt.getY() - (fontMetrics.getHeight() / 2) - fontMetrics.getDescent();
 
-                graphics.drawString(hpText, pt.getX(), pt.getY()); // properly centre the text
+                graphics.drawString(hpText, x, y);
             }
         }
         return null;

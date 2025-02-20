@@ -45,6 +45,8 @@ public class MaidenHandler
                 maxHp = 500;
                 break; // for testing in solo entry mode, todo remove later
             case 2:
+                maxHp = 950;
+                break; // for testing in duo entry mode, todo remove later
             case 3:
                 maxHp = 2625;
                 break;

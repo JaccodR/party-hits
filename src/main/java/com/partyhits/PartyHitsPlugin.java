@@ -4,7 +4,6 @@ import com.google.inject.Provides;
 import javax.inject.Inject;
 
 import com.partyhits.maiden.MaidenHandler;
-import com.partyhits.maiden.MaidenOverlay;
 import com.partyhits.util.Hit;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
@@ -15,7 +14,6 @@ import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.EventBus;
 import net.runelite.client.eventbus.Subscribe;
-import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.party.PartyService;
 import net.runelite.client.party.WSClient;
 import net.runelite.client.plugins.Plugin;
@@ -127,6 +125,9 @@ public class PartyHitsPlugin extends Plugin
 	@Override
 	protected void shutDown()
 	{
+		if (maidenHandler.isMaidenActive())
+			maidenHandler.deactivate();
+
 		overlayManager.remove(partyHitsOverlay);
 		eventBus.unregister(maidenHandler);
 		wsClient.unregisterMessage(Hit.class);
@@ -305,7 +306,7 @@ public class PartyHitsPlugin extends Plugin
 		{
 			return 3;
 		}
-		return 1;
+		return 1; // default to 1 for now
 	}
 
 	private void sendHit(Hit hit)
