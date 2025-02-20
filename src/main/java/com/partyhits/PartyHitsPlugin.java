@@ -301,7 +301,7 @@ public class PartyHitsPlugin extends Plugin
 		}
 		else if (weaponUsed == ItemID.ZARYTE_CROSSBOW)
 		{
-			return 3;
+			return 3; // zcb spec has a set projectile delay of 3, later differentiate between auto/spec
 		}
 		return 1; // default to 1 for now
 	}

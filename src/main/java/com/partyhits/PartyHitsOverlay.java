@@ -88,7 +88,7 @@ public class PartyHitsOverlay extends Overlay
 
     public void addHit(Hit hit, int duration)
     {
-        hits.keySet().removeIf(existingHit -> existingHit.getPlayer().equals(hit.getPlayer())); // if a player still has a hit remove it
+        hits.keySet().removeIf(existingHit -> existingHit.getPlayer().equals(hit.getPlayer())); // if a player still has a hit, remove it
 
         hits.put(hit, duration);
     }
