@@ -52,13 +52,14 @@ public class MaidenOverlay extends Overlay
             String hpText = String.format("%.1f", maidenHp);
             lastHp = maidenHp;
 
-            Point pt = maiden.getCanvasTextLocation(graphics, hpText,25);
+            Point pt = maiden.getCanvasTextLocation(graphics, hpText,25); // add z offset
             if (pt != null)
             {
-                graphics.setFont(new Font("Arial", Font.BOLD, 20));
-                graphics.setColor(Color.GREEN);
+                graphics.setFont(new Font("Arial", Font.BOLD, 20)); // add font options
 
-                graphics.drawString(hpText, pt.getX(), pt.getY());
+                graphics.setColor(Color.GREEN); // add different color options based on hp % thresholds
+
+                graphics.drawString(hpText, pt.getX(), pt.getY()); // properly centre the text
             }
         }
         return null;
