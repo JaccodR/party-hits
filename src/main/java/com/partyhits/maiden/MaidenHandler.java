@@ -7,14 +7,16 @@ import net.runelite.api.Hitsplat;
 import net.runelite.api.HitsplatID;
 import net.runelite.api.NPC;
 import net.runelite.api.NpcID;
-import net.runelite.api.annotations.HitsplatType;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.HitsplatApplied;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.OverlayManager;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class MaidenHandler
@@ -30,10 +32,10 @@ public class MaidenHandler
     private int maxHp;
     @Getter
     private double predictedHpPercent;
+    private double realHpPercent;
     @Getter
     private boolean maidenActive;
-    private double trackedHp;
-    private Map<Integer, Integer> queuedDamage = new HashMap<>();
+    private List<Pair<Integer, Integer>> queuedDamage = new ArrayList<>();
 
     public void init(NPC maiden)
     {
@@ -42,12 +44,12 @@ public class MaidenHandler
         maidenActive = true;
         maidenNpc = maiden;
         predictedHpPercent = 100.0;
+        realHpPercent = 100.0;
 
         int partySize = xpToDamage.getToBPartySize();
         boolean maidenEM = maidenNpc.getId() == NpcID.THE_MAIDEN_OF_SUGADINTI_10814;
 
         maxHp = getMaidenMaxHp(partySize, maidenEM);
-        trackedHp = maxHp;
     }
 
     public void deactivate()
@@ -63,45 +65,31 @@ public class MaidenHandler
     {
         if (maidenActive)
         {
+            for (Pair<Integer, Integer> entry : queuedDamage)
+            {
+                System.out.println("Damage queue entry: " + entry.getLeft() + " expire in: " + entry.getRight());
+            }
             updatePredictedHp();
             reduceQueuedDamage();
         }
     }
 
-    @Subscribe
-    protected void onHitsplatApplied(HitsplatApplied event)
-    {
-        if (event.getActor() == maidenNpc)
-        {
-            Hitsplat hitsplat = event.getHitsplat();
-            int dmg = hitsplat.getAmount();
-            if (hitsplat.getHitsplatType() == HitsplatID.HEAL)
-            {
-                trackedHp += dmg;
-            }
-            else
-            {
-                trackedHp -= dmg;
-            }
-        }
-    }
-
     private void reduceQueuedDamage()
     {
-        Map<Integer, Integer> newMap = new HashMap<>();
+        List<Pair<Integer, Integer>> newQueuedDamage = new ArrayList<>();
 
-        for (Map.Entry<Integer, Integer> entry : queuedDamage.entrySet())
+        for (Pair<Integer, Integer> entry : queuedDamage)
         {
-            int dmg = entry.getKey();
-            int tickDelay = entry.getValue();
+            int dmg = entry.getLeft();
+            int tickDelay = entry.getRight();
 
             tickDelay--;
             if (tickDelay > 0)
             {
-                newMap.put(dmg, tickDelay);
+                newQueuedDamage.add(Pair.of(dmg, tickDelay));
             }
         }
-        queuedDamage = newMap;
+        queuedDamage = newQueuedDamage;
     }
 
     public void updatePredictedHp()
@@ -111,15 +99,15 @@ public class MaidenHandler
             return;
         }
 
+        updateHpPercentage();
         int queuedDmgTotal = 0;
-        for (int damage : queuedDamage.keySet())
+        for (Pair<Integer, Integer> entry : queuedDamage)
         {
-            queuedDmgTotal += damage;
+            queuedDmgTotal += entry.getLeft();
         }
 
         double queuedDamagePercentage = (queuedDmgTotal / (double) maxHp) * 100;
-        double trackedHpPercentage = (trackedHp / (double) maxHp) * 100;
-        predictedHpPercent = trackedHpPercentage - queuedDamagePercentage;
+        predictedHpPercent = realHpPercent - queuedDamagePercentage;
     }
 
     private int getMaidenMaxHp(int partySize, boolean maidenEM)
@@ -146,9 +134,18 @@ public class MaidenHandler
         }
     }
 
+    private void updateHpPercentage()
+    {
+        if (maidenNpc.getHealthRatio() / maidenNpc.getHealthScale() != 1)
+            realHpPercent = ((double) maidenNpc.getHealthRatio() / (double) maidenNpc.getHealthScale() * 100);
+    }
+
     public void queueDamage(Hit hit)
     {
-        queuedDamage.put(hit.getDamage(), hit.getTickDelay());
-        updatePredictedHp();
+        if (hit.getTickDelay() > 0)
+        {
+            queuedDamage.add(Pair.of(hit.getDamage(), hit.getTickDelay()));
+            updatePredictedHp();
+        }
     }
 }

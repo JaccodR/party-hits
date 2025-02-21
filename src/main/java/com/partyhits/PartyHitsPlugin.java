@@ -154,7 +154,7 @@ public class PartyHitsPlugin extends Plugin
 				if (config.maidenHP())
 					maidenHandler.init(npc);
 				break;
-		} // todo addralos
+		}
 	}
 
 	@Subscribe
@@ -272,9 +272,13 @@ public class PartyHitsPlugin extends Plugin
 		{
 			return (int) Math.floor((1 + distance) / 3.0) + 3;
 		}
-		else if (weaponUsed == ItemID.ZARYTE_CROSSBOW || weaponUsed == ItemID.TONALZTICS_OF_RALOS)
+		else if (weaponUsed == ItemID.ZARYTE_CROSSBOW)
 		{
 			return 3; // zcb spec has a set projectile delay of 3, later differentiate between auto & spec
+		}
+		else if (weaponUsed == ItemID.TONALZTICS_OF_RALOS)
+		{
+			return 2;
 		}
 		return 1; // Assuming all other weapons have a delay of 1, later fix for multi tick weapons like claws
 	}
