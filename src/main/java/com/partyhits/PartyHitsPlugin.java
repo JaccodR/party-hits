@@ -150,10 +150,11 @@ public class PartyHitsPlugin extends Plugin
 		{
 			case NpcID.THE_MAIDEN_OF_SUGADINTI: // regular mode
 			case NpcID.THE_MAIDEN_OF_SUGADINTI_10822: // hard mode
+			case NpcID.THE_MAIDEN_OF_SUGADINTI_10814: //entry mode
 				if (config.maidenHP())
 					maidenHandler.init(npc);
 				break;
-		}
+		} // todo addralos
 	}
 
 	@Subscribe
@@ -271,7 +272,7 @@ public class PartyHitsPlugin extends Plugin
 		{
 			return (int) Math.floor((1 + distance) / 3.0) + 3;
 		}
-		else if (weaponUsed == ItemID.ZARYTE_CROSSBOW)
+		else if (weaponUsed == ItemID.ZARYTE_CROSSBOW || weaponUsed == ItemID.TONALZTICS_OF_RALOS)
 		{
 			return 3; // zcb spec has a set projectile delay of 3, later differentiate between auto & spec
 		}
