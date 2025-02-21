@@ -228,7 +228,7 @@ public class PartyHitsPlugin extends Plugin
 					Hit hit = new Hit(dmg, player.getName(), projectileDelay);
 					sendHit(hit);
 					if (config.maidenHP())
-						maidenHandler.queueDamage(hit);
+						maidenHandler.queueDamage(hit, true);
 				}
 			}
 		}
@@ -238,7 +238,7 @@ public class PartyHitsPlugin extends Plugin
 	protected void onHit(Hit hit)
 	{
 		if (config.maidenHP() && inMaidenRegion() && !Objects.equals(hit.getPlayer(), client.getLocalPlayer().getName()))
-			maidenHandler.queueDamage(hit);
+			maidenHandler.queueDamage(hit, false);
 
 		if (config.partyHits() && !Objects.equals(hit.getPlayer(), client.getLocalPlayer().getName()))
 			partyHitsOverlay.addHit(hit, config.duration());

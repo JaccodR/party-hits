@@ -3,26 +3,23 @@ package com.partyhits.maiden;
 import com.partyhits.XpToDamage;
 import com.partyhits.util.Hit;
 import lombok.Getter;
-import net.runelite.api.Hitsplat;
-import net.runelite.api.HitsplatID;
-import net.runelite.api.NPC;
-import net.runelite.api.NpcID;
+import net.runelite.api.*;
 import net.runelite.api.events.GameTick;
-import net.runelite.api.events.HitsplatApplied;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
 
 public class MaidenHandler
 {
     @Inject
     private XpToDamage xpToDamage;
+    @Inject
+    private Client client;
     @Inject
     private MaidenOverlay maidenOverlay;
     @Inject
@@ -65,14 +62,21 @@ public class MaidenHandler
     {
         if (maidenActive)
         {
+            /*
             for (Pair<Integer, Integer> entry : queuedDamage)
             {
+                System.out.println("Current ticks queue:");
                 System.out.println("Damage queue entry: " + entry.getLeft() + " expire in: " + entry.getRight());
             }
-            updatePredictedHp();
+             */
+
+            updateHpPercentage();
+            updatePredictedHp(1);
             reduceQueuedDamage();
         }
     }
+
+
 
     private void reduceQueuedDamage()
     {
@@ -81,9 +85,8 @@ public class MaidenHandler
         for (Pair<Integer, Integer> entry : queuedDamage)
         {
             int dmg = entry.getLeft();
-            int tickDelay = entry.getRight();
+            int tickDelay = entry.getRight() - 1;
 
-            tickDelay--;
             if (tickDelay > 0)
             {
                 newQueuedDamage.add(Pair.of(dmg, tickDelay));
@@ -92,22 +95,23 @@ public class MaidenHandler
         queuedDamage = newQueuedDamage;
     }
 
-    public void updatePredictedHp()
+    public void updatePredictedHp(int tick)
     {
         if (maidenNpc == null || maidenNpc.isDead() || maidenNpc.getHealthScale() == 0)
         {
             return;
         }
 
-        updateHpPercentage();
         int queuedDmgTotal = 0;
         for (Pair<Integer, Integer> entry : queuedDamage)
         {
-            queuedDmgTotal += entry.getLeft();
+            if (entry.getRight() >= tick)
+                queuedDmgTotal += entry.getLeft();
         }
 
         double queuedDamagePercentage = (queuedDmgTotal / (double) maxHp) * 100;
         predictedHpPercent = realHpPercent - queuedDamagePercentage;
+        //System.out.println("Real hp: " + realHpPercent + " Queued dmg% " + queuedDamagePercentage + " predicted% " + predictedHpPercent);
     }
 
     private int getMaidenMaxHp(int partySize, boolean maidenEM)
@@ -140,12 +144,22 @@ public class MaidenHandler
             realHpPercent = ((double) maidenNpc.getHealthRatio() / (double) maidenNpc.getHealthScale() * 100);
     }
 
-    public void queueDamage(Hit hit)
+    public void queueDamage(Hit hit, boolean ownHit)
     {
         if (hit.getTickDelay() > 0)
         {
-            queuedDamage.add(Pair.of(hit.getDamage(), hit.getTickDelay()));
-            updatePredictedHp();
+            if (ownHit)
+            {
+                queuedDamage.add(Pair.of(hit.getDamage(), hit.getTickDelay()));
+                updateHpPercentage();
+                updatePredictedHp(1);
+            }
+            else
+            {
+                queuedDamage.add(Pair.of(hit.getDamage(), hit.getTickDelay() - 1));
+                updateHpPercentage();
+                updatePredictedHp(0);
+            }
         }
     }
 }
