@@ -26,7 +26,7 @@ public class PartyHitsOverlay extends Overlay
     PartyHitsOverlay(PartyHitsPlugin plugin, PartyHitsConfig config)
     {
         setPosition(OverlayPosition.DYNAMIC);
-        setLayer(OverlayLayer.ABOVE_SCENE);
+        setLayer(OverlayLayer.UNDER_WIDGETS);
         this.plugin = plugin;
         this.config = config;
     }
@@ -34,6 +34,8 @@ public class PartyHitsOverlay extends Overlay
     @Override
     public Dimension render(Graphics2D graphics)
     {
+		graphics.setFont(new Font(config.font().toString(), Font.BOLD, config.size()));
+
         Map<Hit, Integer> updatedHits = new HashMap<>();
 
         Iterator<Map.Entry<Hit, Integer>> iterator = hits.entrySet().iterator();
@@ -72,14 +74,14 @@ public class PartyHitsOverlay extends Overlay
             return;
 
         String damageText = String.valueOf(hit.getDamage());
-        Point pt = target.getCanvasTextLocation(graphics, damageText, (int) (target.getLogicalHeight() + 60 + (config.offset() * 10)));
+        Point pt = target.getCanvasTextLocation(graphics, damageText, config.offset() * 10);
         if (pt != null)
         {
-            graphics.setFont(new Font(config.font().toString(), Font.BOLD, config.size()));
+			int x = pt.getX() + config.horOffset();
+			int y = pt.getY();
 
-            FontMetrics fontMetrics = graphics.getFontMetrics();
-            int x = pt.getX() - (fontMetrics.stringWidth(damageText) / 2) + config.horOffset();
-            int y = pt.getY() - (fontMetrics.getHeight() / 2) - fontMetrics.getDescent();
+			graphics.setColor(new Color(0,0,0, config.color().getAlpha()));
+			graphics.drawString(damageText, x + 1, y + 1);
 
             graphics.setColor(config.color());
             graphics.drawString(damageText, x, y);
