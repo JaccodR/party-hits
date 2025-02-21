@@ -19,8 +19,6 @@ public class MaidenHandler
     @Inject
     private XpToDamage xpToDamage;
     @Inject
-    private Client client;
-    @Inject
     private MaidenOverlay maidenOverlay;
     @Inject
     private OverlayManager overlayManager;
@@ -62,14 +60,6 @@ public class MaidenHandler
     {
         if (maidenActive)
         {
-            /*
-            for (Pair<Integer, Integer> entry : queuedDamage)
-            {
-                System.out.println("Current ticks queue:");
-                System.out.println("Damage queue entry: " + entry.getLeft() + " expire in: " + entry.getRight());
-            }
-             */
-
             updateHpPercentage();
             updatePredictedHp(1);
             reduceQueuedDamage();
@@ -111,7 +101,6 @@ public class MaidenHandler
 
         double queuedDamagePercentage = (queuedDmgTotal / (double) maxHp) * 100;
         predictedHpPercent = realHpPercent - queuedDamagePercentage;
-        //System.out.println("Real hp: " + realHpPercent + " Queued dmg% " + queuedDamagePercentage + " predicted% " + predictedHpPercent);
     }
 
     private int getMaidenMaxHp(int partySize, boolean maidenEM)
@@ -151,13 +140,11 @@ public class MaidenHandler
             if (ownHit)
             {
                 queuedDamage.add(Pair.of(hit.getDamage(), hit.getTickDelay()));
-                updateHpPercentage();
                 updatePredictedHp(1);
             }
             else
             {
                 queuedDamage.add(Pair.of(hit.getDamage(), hit.getTickDelay() - 1));
-                updateHpPercentage();
                 updatePredictedHp(0);
             }
         }

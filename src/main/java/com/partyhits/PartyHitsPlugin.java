@@ -150,7 +150,7 @@ public class PartyHitsPlugin extends Plugin
 		{
 			case NpcID.THE_MAIDEN_OF_SUGADINTI: // regular mode
 			case NpcID.THE_MAIDEN_OF_SUGADINTI_10822: // hard mode
-			case NpcID.THE_MAIDEN_OF_SUGADINTI_10814: //entry mode
+			case NpcID.THE_MAIDEN_OF_SUGADINTI_10814: // entry mode
 				if (config.maidenHP())
 					maidenHandler.init(npc);
 				break;
