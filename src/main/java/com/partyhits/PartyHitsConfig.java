@@ -200,49 +200,4 @@ public interface PartyHitsConfig extends Config
 	{
 		return Color.GREEN;
 	}
-	@ConfigItem(
-			position = 15,
-			keyName = "Threshold colors",
-			name = "Threshold colors",
-			description = "Change the color based on maidens HP",
-			section = maidenFontSettings
-	)
-	default boolean threshColor()
-	{
-		return false;
-	}
-	@ConfigItem(
-			position = 16,
-			keyName = "70% Color",
-			name = "70% Color",
-			description = "What color should maiden have under 70%",
-			section = maidenFontSettings
-	)
-	default Color maidenSeventy()
-	{
-		return Color.WHITE;
-	}
-	@ConfigItem(
-			position = 17,
-			keyName = "50% Color",
-			name = "50% Color",
-			description = "What color should maiden have under 50%",
-			section = maidenFontSettings
-	)
-	default Color maidenFifty()
-	{
-		return Color.BLUE;
-	}
-	@ConfigItem(
-			position = 18,
-			keyName = "30% Color",
-			name = "30% Color",
-			description = "What color should maiden have under 30%",
-			section = maidenFontSettings
-	)
-	default Color maidenThirty()
-	{
-		return Color.RED;
-	}
-
 }

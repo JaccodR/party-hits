@@ -29,8 +29,8 @@ import java.util.Set;
 @Slf4j
 @PluginDescriptor(
 	name = "ToB Party Hits",
-		description = "Shows the hits of your party members above their head in ToB",
-		tags = {"party", "hits", "tob"}
+		description = "Shows the hits of your party members in ToB",
+		tags = {"party", "hits", "tob", "maiden"}
 )
 public class PartyHitsPlugin extends Plugin
 {
@@ -58,29 +58,9 @@ public class PartyHitsPlugin extends Plugin
 	private boolean resetXpTrackerLingerTimerFlag = false;
 	private final int MAIDEN_REGIONID = 12613;
 	private final int MAX_XP = 20000000;
-	private static final Set<Integer> MELEE_WEAPONS = new HashSet<>(Arrays.asList(
-			ItemID.SWIFT_BLADE, ItemID.HAM_JOINT, ItemID.GOBLIN_PAINT_CANNON,
-			ItemID.DRAGON_CLAWS, ItemID.DRAGON_SCIMITAR,
-			ItemID.ABYSSAL_BLUDGEON, ItemID.INQUISITORS_MACE,
-			ItemID.SARADOMIN_SWORD, ItemID.SARADOMINS_BLESSED_SWORD,
-			ItemID.GHRAZI_RAPIER, ItemID.HOLY_GHRAZI_RAPIER,
-			ItemID.ABYSSAL_WHIP, ItemID.ABYSSAL_WHIP_OR,
-			ItemID.FROZEN_ABYSSAL_WHIP, ItemID.VOLCANIC_ABYSSAL_WHIP,
-			ItemID.ABYSSAL_TENTACLE, ItemID.ABYSSAL_TENTACLE_OR,
-			ItemID.BLADE_OF_SAELDOR, ItemID.BLADE_OF_SAELDOR_C,
-			ItemID.BLADE_OF_SAELDOR_C_24553, ItemID.BLADE_OF_SAELDOR_C_25870,
-			ItemID.BLADE_OF_SAELDOR_C_25872, ItemID.BLADE_OF_SAELDOR_C_25874,
-			ItemID.BLADE_OF_SAELDOR_C_25876, ItemID.BLADE_OF_SAELDOR_C_25878,
-			ItemID.BLADE_OF_SAELDOR_C_25880, ItemID.BLADE_OF_SAELDOR_C_25882,
-			ItemID.DRAGON_CLAWS_CR, ItemID.CORRUPTED_DRAGON_CLAWS, ItemID.VOIDWAKER,
-			ItemID.DUAL_MACUAHUITL, ItemID.ELDER_MAUL,
-			ItemID.SULPHUR_BLADES, ItemID.GLACIAL_TEMOTLI
-	));
-
 	private static final Set<Integer> RANGED_BOWS = new HashSet<>(Arrays.asList(
 		ItemID.TWISTED_BOW, ItemID.BOW_OF_FAERDHINEN, ItemID.BOW_OF_FAERDHINEN_C, ItemID.ARMADYL_CROSSBOW
 	));
-
 	private static final Set<Integer> RANGED_THROWN = new HashSet<>(Arrays.asList(
 			ItemID.CHINCHOMPA_10033, ItemID.RED_CHINCHOMPA_10034, ItemID.BLACK_CHINCHOMPA,
 			ItemID.BLAZING_BLOWPIPE, ItemID.TOXIC_BLOWPIPE
@@ -95,12 +75,10 @@ public class PartyHitsPlugin extends Plugin
 			ItemID.ACCURSED_SCEPTRE,
 			ItemID.WARPED_SCEPTRE
 	));
-
 	private static final Set<Integer> SHADOW = new HashSet<>(Arrays.asList(
 			ItemID.TUMEKENS_SHADOW,
 			ItemID.CORRUPTED_TUMEKENS_SHADOW
 		));
-
 
 	@Override
 	protected void startUp()
@@ -170,9 +148,8 @@ public class PartyHitsPlugin extends Plugin
 		int npcId = npc.getId();
 		switch (npcId)
 		{
-			case NpcID.THE_MAIDEN_OF_SUGADINTI:
-			case NpcID.THE_MAIDEN_OF_SUGADINTI_10822:
-			case NpcID.THE_MAIDEN_OF_SUGADINTI_10814: // entry mode for now, todo remove later
+			case NpcID.THE_MAIDEN_OF_SUGADINTI: // regular mode
+			case NpcID.THE_MAIDEN_OF_SUGADINTI_10822: // hard mode
 				if (config.maidenHP())
 					maidenHandler.init(npc);
 				break;
@@ -244,11 +221,10 @@ public class PartyHitsPlugin extends Plugin
 								}
 							}
 						}
-
 						projectileDelay = getTickDelay(minDistance);
 					}
 
-					Hit hit = new Hit(dmg, client.getLocalPlayer().getName(), projectileDelay);
+					Hit hit = new Hit(dmg, player.getName(), projectileDelay);
 					sendHit(hit);
 					if (config.maidenHP())
 						maidenHandler.queueDamage(hit);
@@ -279,11 +255,7 @@ public class PartyHitsPlugin extends Plugin
 			return 0;
 
 		int weaponUsed = playerComposition.getEquipmentId(KitType.WEAPON);
-		if (MELEE_WEAPONS.contains(weaponUsed))
-		{
-			return 1;
-		}
-		else if (RANGED_BOWS.contains(weaponUsed))
+		if (RANGED_BOWS.contains(weaponUsed))
 		{
 			return (int) Math.floor((3 + distance) / 6.0) + 2;
 		}
@@ -301,9 +273,9 @@ public class PartyHitsPlugin extends Plugin
 		}
 		else if (weaponUsed == ItemID.ZARYTE_CROSSBOW)
 		{
-			return 3; // zcb spec has a set projectile delay of 3, later differentiate between auto/spec
+			return 3; // zcb spec has a set projectile delay of 3, later differentiate between auto & spec
 		}
-		return 1; // default to 1 for now
+		return 1; // Assuming all other weapons have a delay of 1, later fix for multi tick weapons like claws
 	}
 
 	private void sendHit(Hit hit)

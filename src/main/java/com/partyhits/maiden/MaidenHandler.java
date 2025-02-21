@@ -38,15 +38,12 @@ public class MaidenHandler
         maidenNpc = maiden;
         predictedHpPercent = 100.0;
         realHpPercent = 100.0;
+
         int partySize = xpToDamage.getToBPartySize();
         switch (partySize)
         {
             case 1:
-                maxHp = 500;
-                break; // for testing in solo entry mode, todo remove later
             case 2:
-                maxHp = 950;
-                break; // for testing in duo entry mode, todo remove later
             case 3:
                 maxHp = 2625;
                 break;
@@ -80,6 +77,7 @@ public class MaidenHandler
     private void reduceQueuedDamage()
     {
         Map<Integer, Integer> newMap = new HashMap<>();
+
         for (Map.Entry<Integer, Integer> entry : queuedDamage.entrySet())
         {
             int dmg = entry.getKey();
