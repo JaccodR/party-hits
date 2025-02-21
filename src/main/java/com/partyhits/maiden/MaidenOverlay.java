@@ -19,7 +19,7 @@ public class MaidenOverlay extends Overlay
     public MaidenOverlay(MaidenHandler maidenHandler, PartyHitsConfig config)
     {
         setPosition(OverlayPosition.DYNAMIC);
-        setLayer(OverlayLayer.ABOVE_SCENE);
+        setLayer(OverlayLayer.UNDER_WIDGETS);
         this.maidenHandler = maidenHandler;
         this.config = config;
     }
@@ -39,14 +39,15 @@ public class MaidenOverlay extends Overlay
             Point pt = maiden.getCanvasTextLocation(graphics, hpText,config.maidenOffset() * 5);
             if (pt != null)
             {
-                graphics.setFont(new Font(config.maidenFont().getName(), Font.BOLD, config.maidenSize()));
-                graphics.setColor(config.maidenColor());
+				graphics.setFont(new Font(config.maidenFont().getName(), Font.BOLD, config.maidenSize()));
+				int x = pt.getX() + config.maidenHorOffset();
+				int y = pt.getY();
 
-                FontMetrics fontMetrics = graphics.getFontMetrics();
-                int x = pt.getX() - (fontMetrics.stringWidth(hpText) / 2) + config.maidenHorOffset();
-                int y = pt.getY() - (fontMetrics.getHeight() / 2) - fontMetrics.getDescent();
+				graphics.setColor(new Color(0,0,0, config.maidenColor().getAlpha()));
+				graphics.drawString(hpText, x + 1, y + 1);
 
-                graphics.drawString(hpText, x, y);
+				graphics.setColor(config.maidenColor());
+				graphics.drawString(hpText, x, y);
             }
         }
         return null;

@@ -7,6 +7,7 @@ import net.runelite.client.config.ConfigItem;
 import net.runelite.client.config.ConfigSection;
 
 import java.awt.*;
+import net.runelite.client.config.Range;
 
 @ConfigGroup("partyhits")
 public interface PartyHitsConfig extends Config
@@ -90,6 +91,7 @@ public interface PartyHitsConfig extends Config
 	{
 		return false;
 	}
+	@Range(min = -100, max = 100)
 	@ConfigItem(
 			position = 5,
 			keyName = "Height Offset",
@@ -99,8 +101,9 @@ public interface PartyHitsConfig extends Config
 	)
 	default int offset()
 	{
-		return 5;
+		return 20;
 	}
+	@Range(min = -100, max = 100)
 	@ConfigItem(
 			position = 6,
 			keyName = "Horizontal Offset",
@@ -110,7 +113,7 @@ public interface PartyHitsConfig extends Config
 	)
 	default int horOffset()
 	{
-		return 4;
+		return 0;
 	}
 	@ConfigItem(
 			position = 7,
@@ -145,6 +148,7 @@ public interface PartyHitsConfig extends Config
 	{
 		return Color.WHITE;
 	}
+	@Range(min = -100, max = 100)
 	@ConfigItem(
 			position = 10,
 			keyName = "Maiden Height Offset",
@@ -154,8 +158,9 @@ public interface PartyHitsConfig extends Config
 	)
 	default int maidenOffset()
 	{
-		return 10;
+		return 30;
 	}
+	@Range(min = -100, max = 100)
 	@ConfigItem(
 			position = 11,
 			keyName = "Maiden Horizontal Offset",
@@ -165,7 +170,7 @@ public interface PartyHitsConfig extends Config
 	)
 	default int maidenHorOffset()
 	{
-		return 15;
+		return -5;
 	}
 	@ConfigItem(
 			position = 12,
