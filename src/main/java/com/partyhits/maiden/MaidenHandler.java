@@ -66,8 +66,6 @@ public class MaidenHandler
         }
     }
 
-
-
     private void reduceQueuedDamage()
     {
         List<Pair<Integer, Integer>> newQueuedDamage = new ArrayList<>();
@@ -77,7 +75,7 @@ public class MaidenHandler
             int dmg = entry.getLeft();
             int tickDelay = entry.getRight() - 1;
 
-            if (tickDelay > 0)
+            if (tickDelay >= 0)
             {
                 newQueuedDamage.add(Pair.of(dmg, tickDelay));
             }

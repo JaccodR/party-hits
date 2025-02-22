@@ -59,7 +59,8 @@ public class PartyHitsPlugin extends Plugin
 	private final int MAIDEN_REGIONID = 12613;
 	private final int MAX_XP = 20000000;
 	private static final Set<Integer> RANGED_BOWS = new HashSet<>(Arrays.asList(
-		ItemID.TWISTED_BOW, ItemID.BOW_OF_FAERDHINEN, ItemID.BOW_OF_FAERDHINEN_C, ItemID.ARMADYL_CROSSBOW
+			ItemID.TWISTED_BOW, ItemID.BOW_OF_FAERDHINEN, ItemID.BOW_OF_FAERDHINEN_C,
+			ItemID.ARMADYL_CROSSBOW, ItemID.RUNE_CROSSBOW, ItemID.DRAGON_CROSSBOW
 	));
 	private static final Set<Integer> RANGED_THROWN = new HashSet<>(Arrays.asList(
 			ItemID.CHINCHOMPA_10033, ItemID.RED_CHINCHOMPA_10034, ItemID.BLACK_CHINCHOMPA,
@@ -280,7 +281,7 @@ public class PartyHitsPlugin extends Plugin
 		{
 			return 2;
 		}
-		return 1; // Assuming all other weapons have a delay of 1, later fix for multi tick weapons like claws
+		return 1; // Assuming all other weapons have a delay of 1, later fix for multi tick weapons like claws/dualies
 	}
 
 	private void sendHit(Hit hit)
