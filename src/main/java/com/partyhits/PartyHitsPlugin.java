@@ -28,7 +28,7 @@ import java.util.Set;
 
 @Slf4j
 @PluginDescriptor(
-	name = "ToB Party Hits",
+	name = "ToB Predicted Hit",
 		description = "Shows the hits of your party members in ToB",
 		tags = {"party", "hits", "tob", "maiden"}
 )
@@ -186,9 +186,8 @@ public class PartyHitsPlugin extends Plugin
 		if (!inTob())
 			return;
 
-		if (config.maidenOnly())
-			if (!inMaidenRegion())
-				return;
+		if (config.maidenOnly() && !inMaidenRegion())
+			return;
 
 		if (skill == Skill.HITPOINTS)
 		{

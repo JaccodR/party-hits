@@ -60,8 +60,8 @@ public interface PartyHitsConfig extends Config
 	}
 	@ConfigItem(
 			position = 2,
-			keyName = "Show self",
-			name = "Show self",
+			keyName = "Show Self",
+			name = "Show Self",
 			description = "Show your own hits.",
 			section = generalSettings
 	)
@@ -82,7 +82,7 @@ public interface PartyHitsConfig extends Config
 	}
 	@ConfigItem(
 			position = 4,
-			keyName = "Maiden live HP",
+			keyName = "Maiden Live HP",
 			name = "Maiden Live HP",
 			description = "Shows maidens current hp.",
 			section = maidenSettings
