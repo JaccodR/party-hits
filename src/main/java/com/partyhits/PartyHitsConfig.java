@@ -29,12 +29,12 @@ public interface PartyHitsConfig extends Config
 	String fontSettings = "fontSettings";
 
 	@ConfigSection(
-			name = "Maiden HP Font",
+			name = "Maiden",
 			position = 2,
-			description = "Maiden HP Font Settings",
+			description = "Maiden Settings",
 			closedByDefault = true
 	)
-	String maidenFontSettings = "maidenFontSettings";
+	String maidenSettings = "maidenSettings";
 
 	@ConfigItem(
 			position = 0,
@@ -52,7 +52,7 @@ public interface PartyHitsConfig extends Config
 			keyName = "Maiden only",
 			name = "Maiden only",
 			description = "Only show in the maiden room.",
-			section = generalSettings
+			section = maidenSettings
 	)
 	default boolean maidenOnly()
 	{
@@ -85,7 +85,7 @@ public interface PartyHitsConfig extends Config
 			keyName = "Maiden live HP",
 			name = "Maiden Live HP",
 			description = "Shows maidens current hp.",
-			section = generalSettings
+			section = maidenSettings
 	)
 	default boolean maidenHP()
 	{
@@ -154,7 +154,7 @@ public interface PartyHitsConfig extends Config
 			keyName = "Maiden Height Offset",
 			name = "Maiden Height Offset",
 			description = "Make the Maiden HP higher.",
-			section = maidenFontSettings
+			section = maidenSettings
 	)
 	default int maidenOffset()
 	{
@@ -166,7 +166,7 @@ public interface PartyHitsConfig extends Config
 			keyName = "Maiden Horizontal Offset",
 			name = "Maiden Horizontal Offset",
 			description = "Adjust the horizontal offset of the text on maiden.",
-			section = maidenFontSettings
+			section = maidenSettings
 	)
 	default int maidenHorOffset()
 	{
@@ -177,7 +177,7 @@ public interface PartyHitsConfig extends Config
 			keyName = "Maiden Font",
 			name = "Maiden Font",
 			description = "Change the font of the HP on maiden.",
-			section = maidenFontSettings
+			section = maidenSettings
 	)
 	default FontTypes maidenFont()
 	{
@@ -188,7 +188,7 @@ public interface PartyHitsConfig extends Config
 			keyName = "Maiden Font Size",
 			name = "Maiden Font Size",
 			description = "Change the size of the HP on maiden.",
-			section = maidenFontSettings
+			section = maidenSettings
 	)
 	default int maidenSize()
 	{
@@ -199,7 +199,7 @@ public interface PartyHitsConfig extends Config
 			keyName = "Maiden Text Color",
 			name = "Maiden Text Color",
 			description = "Change the color of the text on maiden.",
-			section = maidenFontSettings
+			section = maidenSettings
 	)
 	default Color maidenColor()
 	{
@@ -210,7 +210,7 @@ public interface PartyHitsConfig extends Config
 			keyName = "Sync hits",
 			name = "Sync hits",
 			description = "Sync your own hits with your teammates",
-			section = generalSettings
+			section = maidenSettings
 	)
 	default boolean syncHits()
 	{

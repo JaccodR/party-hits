@@ -228,7 +228,7 @@ public class PartyHitsPlugin extends Plugin
 
 					Hit hit = new Hit(dmg, player.getName(), projectileDelay);
 					sendHit(hit);
-					if (config.maidenHP() && !config.ownHits())
+					if (config.maidenHP() && !config.syncHits())
 						maidenHandler.queueDamage(hit, true);
 				}
 			}
@@ -238,14 +238,20 @@ public class PartyHitsPlugin extends Plugin
 	@Subscribe
 	protected void onHit(Hit hit)
 	{
-		if (config.maidenHP() && inMaidenRegion())
-			if (Objects.equals(hit.getPlayer(), client.getLocalPlayer().getName()) && config.ownHits())
-				maidenHandler.queueDamage(hit, false);
-			else if (!Objects.equals(hit.getPlayer(), client.getLocalPlayer().getName()))
-				maidenHandler.queueDamage(hit, false);
+		boolean isLocalPlayer = Objects.equals(hit.getPlayer(), client.getLocalPlayer().getName());
 
-		if (config.partyHits() && !Objects.equals(hit.getPlayer(), client.getLocalPlayer().getName()))
+		if (config.maidenHP() && inMaidenRegion())
+		{
+			if (!isLocalPlayer || config.syncHits())
+			{
+				maidenHandler.queueDamage(hit, false);
+			}
+		}
+
+		if (config.partyHits() && !isLocalPlayer)
+		{
 			partyHitsOverlay.addHit(hit, config.duration());
+		}
 	}
 
 	private int getTickDelay(int distance)
