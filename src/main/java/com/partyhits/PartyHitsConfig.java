@@ -49,10 +49,10 @@ public interface PartyHitsConfig extends Config
 	}
 	@ConfigItem(
 			position = 1,
-			keyName = "Maiden only",
-			name = "Maiden only",
-			description = "Only show in the maiden room.",
-			section = maidenSettings
+			keyName = "Maiden oOnly",
+			name = "Maiden Only",
+			description = "Only show hits in the maiden room.",
+			section = generalSettings
 	)
 	default boolean maidenOnly()
 	{
