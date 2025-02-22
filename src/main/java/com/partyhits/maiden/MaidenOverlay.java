@@ -14,6 +14,7 @@ public class MaidenOverlay extends Overlay
 {
     private final PartyHitsConfig config;
     private final MaidenHandler maidenHandler;
+    private double lastRenderedHp = 100.0;
 
     @Inject
     public MaidenOverlay(MaidenHandler maidenHandler, PartyHitsConfig config)
@@ -34,7 +35,12 @@ public class MaidenOverlay extends Overlay
             if (maidenHp < 0)
                 maidenHp = 0;
 
-            String hpText = String.format("%.1f", maidenHp);
+            double threshold = config.updateThreshold();
+            if (Math.abs(maidenHp - lastRenderedHp) >= threshold)
+            {
+                lastRenderedHp = maidenHp;
+            }
+            String hpText = String.format("%.1f", lastRenderedHp);
 
             Point pt = maiden.getCanvasTextLocation(graphics, hpText,config.maidenOffset() * 5);
             if (pt != null)

@@ -209,11 +209,22 @@ public interface PartyHitsConfig extends Config
 			position = 15,
 			keyName = "Sync hits",
 			name = "Sync hits",
-			description = "Sync your own hits with your teammates",
+			description = "Sync your hits with your teammates (delays your hits updating slightly)",
 			section = maidenSettings
 	)
 	default boolean syncHits()
 	{
 		return false;
+	}
+	@ConfigItem(
+			position = 16,
+			keyName = "Update Threshold",
+			name = "Update Threshold",
+			description = "Only update Maidens HP if it is % from old hp",
+			section = maidenSettings
+	)
+	default double updateThreshold()
+	{
+		return 0.2;
 	}
 }
