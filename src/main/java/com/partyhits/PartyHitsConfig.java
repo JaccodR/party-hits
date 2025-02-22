@@ -205,4 +205,15 @@ public interface PartyHitsConfig extends Config
 	{
 		return Color.GREEN;
 	}
+	@ConfigItem(
+			position = 15,
+			keyName = "Sync hits",
+			name = "Sync hits",
+			description = "Sync your own hits with your teammates",
+			section = generalSettings
+	)
+	default boolean syncHits()
+	{
+		return false;
+	}
 }
