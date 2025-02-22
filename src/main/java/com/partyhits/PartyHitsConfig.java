@@ -49,7 +49,7 @@ public interface PartyHitsConfig extends Config
 	}
 	@ConfigItem(
 			position = 1,
-			keyName = "Maiden oOnly",
+			keyName = "Maiden Only",
 			name = "Maiden Only",
 			description = "Only show hits in the maiden room.",
 			section = generalSettings
@@ -220,7 +220,7 @@ public interface PartyHitsConfig extends Config
 			position = 16,
 			keyName = "Update Threshold",
 			name = "Update Threshold",
-			description = "Only update Maidens HP if it is % from old hp",
+			description = "Only update Maidens HP if change is more than x% from old hp",
 			section = maidenSettings
 	)
 	default double updateThreshold()
