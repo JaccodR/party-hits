@@ -186,9 +186,6 @@ public class PartyHitsPlugin extends Plugin
 		if (!inTob())
 			return;
 
-		if (config.maidenOnly() && !inMaidenRegion())
-			return;
-
 		if (skill == Skill.HITPOINTS)
 		{
 			Player player = client.getLocalPlayer();
@@ -295,10 +292,14 @@ public class PartyHitsPlugin extends Plugin
 	{
 		if (party.isInParty())
 		{
+			clientThread.invokeLater(() -> party.send(hit));
+
+			if (config.maidenOnly() && !inMaidenRegion())
+				return;
+
 			if (config.ownHits() && Objects.equals(hit.getPlayer(), client.getLocalPlayer().getName()))
 				partyHitsOverlay.addHit(hit, config.duration());
 
-			clientThread.invokeLater(() -> party.send(hit));
 		}
 	}
 
