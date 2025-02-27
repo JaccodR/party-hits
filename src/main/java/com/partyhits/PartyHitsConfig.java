@@ -227,4 +227,15 @@ public interface PartyHitsConfig extends Config
 	{
 		return 0.2;
 	}
+	@ConfigItem(
+			position = 17,
+			keyName = "Update on tick only",
+			name = "Update on tick only",
+			description = "Only update maidens health every tick, instead of on xp drop",
+			section = maidenSettings
+	)
+	default boolean onTickOnly()
+	{
+		return false;
+	}
 }

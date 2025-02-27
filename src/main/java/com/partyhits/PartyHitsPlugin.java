@@ -56,6 +56,7 @@ public class PartyHitsPlugin extends Plugin
 	private EventBus eventBus;
 	private static final int[] previousExp = new int[Skill.values().length];
 	private boolean resetXpTrackerLingerTimerFlag = false;
+	private boolean inTob = false;
 	private final int MAIDEN_REGIONID = 12613;
 	private final int MAX_XP = 20000000;
 	private static final Set<Integer> RANGED_BOWS = new HashSet<>(Arrays.asList(
@@ -87,6 +88,7 @@ public class PartyHitsPlugin extends Plugin
 		overlayManager.add(partyHitsOverlay);
 		wsClient.registerMessage(Hit.class);
 		eventBus.register(maidenHandler);
+		inTob = false;
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
 			clientThread.invokeLater(() ->
@@ -110,6 +112,18 @@ public class PartyHitsPlugin extends Plugin
 		overlayManager.remove(partyHitsOverlay);
 		eventBus.unregister(maidenHandler);
 		wsClient.unregisterMessage(Hit.class);
+	}
+
+	@Subscribe
+	protected void onVarbitChanged(VarbitChanged event)
+	{
+		if (client.getLocalPlayer() == null)
+			return;
+
+		int tobVar = client.getVarbitValue(Varbits.THEATRE_OF_BLOOD);
+		inTob = tobVar == 2 || tobVar == 3;
+		if (!inTob && maidenHandler.isMaidenActive())
+			maidenHandler.deactivate();
 	}
 
 	@Subscribe
@@ -142,7 +156,7 @@ public class PartyHitsPlugin extends Plugin
 	@Subscribe
 	protected void onNpcSpawned(NpcSpawned event)
 	{
-		if (!inTob() || !inMaidenRegion())
+		if (!inTob || !inMaidenRegion())
 			return;
 
 		NPC npc = event.getNpc();
@@ -161,7 +175,7 @@ public class PartyHitsPlugin extends Plugin
 	@Subscribe
 	protected void onNpcDespawned(NpcDespawned event)
 	{
-		if (!inTob() || !inMaidenRegion())
+		if (!inTob || !inMaidenRegion())
 			return;
 
 		String npcName = event.getNpc().getName();
@@ -183,7 +197,7 @@ public class PartyHitsPlugin extends Plugin
 
 	private void processXP(Skill skill, int xpDrop)
 	{
-		if (!inTob())
+		if (!inTob)
 			return;
 
 		if (skill == Skill.HITPOINTS)
@@ -302,13 +316,6 @@ public class PartyHitsPlugin extends Plugin
 
 		}
 	}
-
-	private boolean inTob()
-	{
-		int tobVar = client.getVarbitValue(Varbits.THEATRE_OF_BLOOD);
-		return tobVar == 2 || tobVar == 3;
-	}
-
 	private boolean inMaidenRegion()
 	{
 		return ArrayUtils.contains(client.getTopLevelWorldView().getMapRegions(), MAIDEN_REGIONID);

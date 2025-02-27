@@ -1,5 +1,6 @@
 package com.partyhits.maiden;
 
+import com.partyhits.PartyHitsConfig;
 import com.partyhits.XpToDamage;
 import com.partyhits.util.Hit;
 import lombok.Getter;
@@ -16,6 +17,8 @@ import java.util.List;
 
 public class MaidenHandler
 {
+    @Inject
+    PartyHitsConfig config;
     @Inject
     private XpToDamage xpToDamage;
     @Inject
@@ -138,12 +141,14 @@ public class MaidenHandler
             if (ownHit)
             {
                 queuedDamage.add(Pair.of(hit.getDamage(), hit.getTickDelay()));
-                updatePredictedHp(1);
+                if (!config.onTickOnly())
+                    updatePredictedHp(1);
             }
             else
             {
                 queuedDamage.add(Pair.of(hit.getDamage(), hit.getTickDelay() - 1));
-                updatePredictedHp(0);
+                if (!config.onTickOnly())
+                    updatePredictedHp(0);
             }
         }
     }

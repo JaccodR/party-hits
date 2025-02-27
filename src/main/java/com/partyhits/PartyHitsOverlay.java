@@ -34,25 +34,22 @@ public class PartyHitsOverlay extends Overlay
     @Override
     public Dimension render(Graphics2D graphics)
     {
-		graphics.setFont(new Font(config.font().toString(), Font.BOLD, config.size()));
+        graphics.setFont(new Font(config.font().toString(), Font.BOLD, config.size()));
 
         Map<Hit, Integer> updatedHits = new HashMap<>();
 
-        Iterator<Map.Entry<Hit, Integer>> iterator = hits.entrySet().iterator();
-
-        while (iterator.hasNext())
-        {
-            Map.Entry<Hit, Integer> entry = iterator.next();
+        hits.entrySet().removeIf(entry -> {
             Hit hit = entry.getKey();
             int duration = entry.getValue();
-            if (duration <= 0)
+            if (duration > 0)
             {
-                iterator.remove();
-                continue;
+                renderHit(graphics, hit);
+                updatedHits.put(hit, duration - 1);
+                return false;
             }
-            renderHit(graphics, hit);
-            updatedHits.put(hit, duration - 1);
-        }
+            return true;
+        });
+
         hits.putAll(updatedHits);
 
         return null;
