@@ -21,10 +21,7 @@ import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @PluginDescriptor(
@@ -55,6 +52,7 @@ public class PartyHitsPlugin extends Plugin
 	@Inject
 	private EventBus eventBus;
 	private static final int[] previousExp = new int[Skill.values().length];
+	private final List<Integer> hitBuffer = new ArrayList<>();
 	private boolean resetXpTrackerLingerTimerFlag = false;
 	private boolean inTob = false;
 	private final int MAIDEN_REGIONID = 12613;
@@ -122,21 +120,9 @@ public class PartyHitsPlugin extends Plugin
 
 		int tobVar = client.getVarbitValue(Varbits.THEATRE_OF_BLOOD);
 		inTob = tobVar == 2 || tobVar == 3;
+
 		if (!inTob && maidenHandler.isMaidenActive())
 			maidenHandler.deactivate();
-	}
-
-	@Subscribe
-	protected void onStatChanged(StatChanged event)
-	{
-		int currentXp = event.getXp();
-		int previousXp = previousExp[event.getSkill().ordinal()];
-		int xpDiff = currentXp - previousXp;
-		if (previousXp > 0 && xpDiff > 0)
-		{
-			processXP(event.getSkill(), xpDiff);
-		}
-		previousExp[event.getSkill().ordinal()] = event.getXp();
 	}
 
 	@Subscribe
@@ -187,20 +173,50 @@ public class PartyHitsPlugin extends Plugin
 	}
 
 	@Subscribe
+	protected void onGameTick(GameTick event)
+	{
+		if (!inTob)
+			return;
+
+		if (!hitBuffer.isEmpty())
+		{
+			int totalXp = 0;
+			for (int xp : hitBuffer)
+			{
+				totalXp += xp;
+			}
+			processXP(totalXp);
+			hitBuffer.clear();
+		}
+	}
+
+	@Subscribe
+	protected void onStatChanged(StatChanged event)
+	{
+		int currentXp = event.getXp();
+		int previousXp = previousExp[event.getSkill().ordinal()];
+		int xpDiff = currentXp - previousXp;
+		if (previousXp > 0 && xpDiff > 0)
+		{
+			if (event.getSkill() == Skill.HITPOINTS)
+				hitBuffer.add(xpDiff);
+		}
+		previousExp[event.getSkill().ordinal()] = event.getXp();
+	}
+
+	@Subscribe
 	protected void onFakeXpDrop(FakeXpDrop event)
 	{
 		if (event.getXp() >= MAX_XP)
 			return;
 
-		processXP(event.getSkill(), event.getXp());
+		if (event.getSkill() == Skill.HITPOINTS)
+			hitBuffer.add(event.getXp());
 	}
 
-	private void processXP(Skill skill, int xpDrop)
+	private void processXP(int xpDrop)
 	{
-		if (!inTob)
-			return;
-
-		if (skill == Skill.HITPOINTS)
+		if (inTob)
 		{
 			Player player = client.getLocalPlayer();
 			if (player == null)
