@@ -216,48 +216,48 @@ public class PartyHitsPlugin extends Plugin
 
 	private void processXP(int xpDrop)
 	{
-		if (inTob)
+		if (!inTob)
+			return;
+
+		Player player = client.getLocalPlayer();
+		if (player == null)
+			return;
+
+		Actor actor = player.getInteracting();
+		if (!(actor instanceof NPC))
+			return;
+
+		int npcId = ((NPC) actor).getId();
+
+		int dmg = xpToDamage.calculateHit(npcId, xpDrop);
+		if (dmg > 0)
 		{
-			Player player = client.getLocalPlayer();
-			if (player == null)
-				return;
-
-			Actor actor = player.getInteracting();
-			if (actor instanceof NPC)
+			int projectileDelay = 0;
+			if (Objects.equals(actor.getName(), "The Maiden of Sugadinti"))
 			{
-				int npcId = ((NPC) actor).getId();
+				WorldPoint maidenLoc = actor.getWorldLocation();
+				int minDistance = 10;
 
-				int dmg = xpToDamage.calculateHit(npcId, xpDrop);
-				if (dmg > 0)
+				for (int x = 0; x < 6; x++)
 				{
-					int projectileDelay = 0;
-					if (Objects.equals(actor.getName(), "The Maiden of Sugadinti"))
+					for (int y = 0; y < 6; y++)
 					{
-						WorldPoint maidenLoc = actor.getWorldLocation();
-						int minDistance = 10;
+						WorldPoint tileLocation = new WorldPoint(maidenLoc.getX() + x, maidenLoc.getY() + y, maidenLoc.getPlane());
+						int distance = player.getWorldLocation().distanceTo(tileLocation);
 
-						for (int x = 0; x < 6; x++)
+						if (distance < minDistance)
 						{
-							for (int y = 0; y < 6; y++)
-							{
-								WorldPoint tileLocation = new WorldPoint(maidenLoc.getX() + x, maidenLoc.getY() + y, maidenLoc.getPlane());
-								int distance = player.getWorldLocation().distanceTo(tileLocation);
-
-								if (distance < minDistance)
-								{
-									minDistance = distance;
-								}
-							}
+							minDistance = distance;
 						}
-						projectileDelay = getTickDelay(minDistance);
 					}
-
-					Hit hit = new Hit(dmg, player.getName(), projectileDelay);
-					sendHit(hit);
-					if (config.maidenHP() && !config.syncHits())
-						maidenHandler.queueDamage(hit, true);
 				}
+				projectileDelay = getTickDelay(minDistance);
 			}
+
+			Hit hit = new Hit(dmg, player.getName(), projectileDelay);
+			sendHit(hit);
+			if (config.maidenHP() && !config.syncHits())
+				maidenHandler.queueDamage(hit, true);
 		}
 	}
 
@@ -315,7 +315,11 @@ public class PartyHitsPlugin extends Plugin
 		{
 			return 2;
 		}
-		return 1; // Assuming all other weapons have a delay of 1, later fix for multi tick weapons like claws/dualies
+		else if (weaponUsed == ItemID.DRAGON_CLAWS || weaponUsed == ItemID.BURNING_CLAWS || weaponUsed == ItemID.DUAL_MACUAHUITL)
+		{
+			return 0; // later fix these multi hitsplat weapons to work for maiden damage queue, for now just exclude them
+		}
+		return 1;
 	}
 
 	private void sendHit(Hit hit)
