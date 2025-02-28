@@ -115,14 +115,14 @@ public class PartyHitsPlugin extends Plugin
 	@Subscribe
 	protected void onVarbitChanged(VarbitChanged event)
 	{
-		if (client.getLocalPlayer() == null)
-			return;
+		if (event.getVarbitId() == Varbits.THEATRE_OF_BLOOD)
+		{
+			int tobVar = event.getValue();
+			inTob = tobVar == 2 || tobVar == 3;
 
-		int tobVar = client.getVarbitValue(Varbits.THEATRE_OF_BLOOD);
-		inTob = tobVar == 2 || tobVar == 3;
-
-		if (!inTob && maidenHandler.isMaidenActive())
-			maidenHandler.deactivate();
+			if (!inTob && maidenHandler.isMaidenActive())
+				maidenHandler.deactivate();
+		}
 	}
 
 	@Subscribe

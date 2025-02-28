@@ -9,7 +9,7 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 
 import javax.inject.Inject;
 import java.awt.*;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
 import java.util.Objects;
 
@@ -19,7 +19,7 @@ public class PartyHitsOverlay extends Overlay
     private final PartyHitsConfig config;
     @Inject
     private Client client;
-    private final Map<Hit, Integer> hits = new HashMap<>();
+    private final Map<Hit, Integer> hits = new ConcurrentHashMap<>();
 
     @Inject
     PartyHitsOverlay(PartyHitsPlugin plugin, PartyHitsConfig config)
@@ -35,22 +35,21 @@ public class PartyHitsOverlay extends Overlay
     {
         graphics.setFont(new Font(config.font().toString(), Font.BOLD, config.size()));
 
-        Map<Hit, Integer> updatedHits = new HashMap<>();
-
-        hits.entrySet().removeIf(entry -> {
+        for (Map.Entry<Hit, Integer> entry : hits.entrySet())
+        {
             Hit hit = entry.getKey();
             int duration = entry.getValue();
+
             if (duration > 0)
             {
                 renderHit(graphics, hit);
-                updatedHits.put(hit, duration - 1);
-                return false;
+                hits.replace(hit, duration - 1);
             }
-            return true;
-        });
-
-        hits.putAll(updatedHits);
-
+            else
+            {
+                hits.remove(hit, duration);
+            }
+        }
         return null;
     }
 
