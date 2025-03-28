@@ -117,7 +117,7 @@ public class PartyHitsPlugin extends Plugin
 		if (maidenHandler.isBossActive())
 			maidenHandler.deactivate();
 		if (verzikHandler.isBossActive())
-			maidenHandler.deactivate();
+			verzikHandler.deactivate();
 
 		overlayManager.remove(partyHitsOverlay);
 		eventBus.unregister(maidenHandler);
@@ -209,7 +209,7 @@ public class PartyHitsPlugin extends Plugin
 		else if (Objects.equals(npcName, "Verzik Vitur"))
 		{
 			if (verzikHandler.isBossActive())
-				maidenHandler.deactivate();
+				verzikHandler.deactivate();
 		}
 	}
 
