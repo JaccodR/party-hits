@@ -3,7 +3,8 @@ package com.partyhits;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 
-import com.partyhits.maiden.MaidenHandler;
+import com.partyhits.bosses.MaidenHandler;
+import com.partyhits.bosses.VerzikHandler;
 import com.partyhits.util.Hit;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
@@ -27,7 +28,7 @@ import java.util.*;
 @PluginDescriptor(
 	name = "ToB Predicted Hit",
 		description = "Shows the hits of your party members in ToB",
-		tags = {"party", "hits", "tob", "maiden"}
+		tags = {"party", "hits", "tob", "maiden", "verzik"}
 )
 public class PartyHitsPlugin extends Plugin
 {
@@ -50,6 +51,8 @@ public class PartyHitsPlugin extends Plugin
 	@Inject
 	private MaidenHandler maidenHandler;
 	@Inject
+	private VerzikHandler verzikHandler;
+	@Inject
 	private EventBus eventBus;
 	private static final int[] previousExp = new int[Skill.values().length];
 	private final List<Integer> hitBuffer = new ArrayList<>();
@@ -57,6 +60,12 @@ public class PartyHitsPlugin extends Plugin
 	private boolean inTob = false;
 	private final int MAIDEN_REGIONID = 12613;
 	private final int MAX_XP = 20000000;
+	private static final Set<Integer> VERZIK_P2_IDS = new HashSet<>(Arrays.asList(
+			NpcID.VERZIK_VITUR_8372, NpcID.VERZIK_VITUR_10850, NpcID.VERZIK_VITUR_10833
+	));
+	private static final Set<Integer> VERZIK_P3_IDS = new HashSet<>(Arrays.asList(
+			NpcID.VERZIK_VITUR_8374, NpcID.VERZIK_VITUR_10852, NpcID.VERZIK_VITUR_10835
+	));
 	private static final Set<Integer> RANGED_BOWS = new HashSet<>(Arrays.asList(
 			ItemID.TWISTED_BOW, ItemID.BOW_OF_FAERDHINEN, ItemID.BOW_OF_FAERDHINEN_C,
 			ItemID.ARMADYL_CROSSBOW, ItemID.RUNE_CROSSBOW, ItemID.DRAGON_CROSSBOW
@@ -86,6 +95,7 @@ public class PartyHitsPlugin extends Plugin
 		overlayManager.add(partyHitsOverlay);
 		wsClient.registerMessage(Hit.class);
 		eventBus.register(maidenHandler);
+		eventBus.register(verzikHandler);
 		inTob = false;
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
@@ -104,11 +114,14 @@ public class PartyHitsPlugin extends Plugin
 	@Override
 	protected void shutDown()
 	{
-		if (maidenHandler.isMaidenActive())
+		if (maidenHandler.isBossActive())
+			maidenHandler.deactivate();
+		if (verzikHandler.isBossActive())
 			maidenHandler.deactivate();
 
 		overlayManager.remove(partyHitsOverlay);
 		eventBus.unregister(maidenHandler);
+		eventBus.unregister(verzikHandler);
 		wsClient.unregisterMessage(Hit.class);
 	}
 
@@ -120,8 +133,10 @@ public class PartyHitsPlugin extends Plugin
 			int tobVar = event.getValue();
 			inTob = tobVar == 2 || tobVar == 3;
 
-			if (!inTob && maidenHandler.isMaidenActive())
+			if (!inTob && maidenHandler.isBossActive())
 				maidenHandler.deactivate();
+			if (!inTob && verzikHandler.isBossActive())
+				verzikHandler.deactivate();
 		}
 	}
 
@@ -142,7 +157,7 @@ public class PartyHitsPlugin extends Plugin
 	@Subscribe
 	protected void onNpcSpawned(NpcSpawned event)
 	{
-		if (!inTob || !inMaidenRegion())
+		if (!inTob)
 			return;
 
 		NPC npc = event.getNpc();
@@ -156,18 +171,44 @@ public class PartyHitsPlugin extends Plugin
 					maidenHandler.init(npc);
 				break;
 		}
+
+		if (VERZIK_P3_IDS.contains(npcId))
+		{
+			if (config.verzikHpP3())
+				verzikHandler.init(npc);
+		}
+	}
+
+	@Subscribe
+	protected void onNpcChanged(NpcChanged event)
+	{
+		if (!inTob)
+			return;
+
+		NPC npc = event.getNpc();
+		int npcId = npc.getId();
+		if (VERZIK_P2_IDS.contains(npcId))
+		{
+			if (config.verzikHpP2())
+				verzikHandler.init(npc);
+		}
 	}
 
 	@Subscribe
 	protected void onNpcDespawned(NpcDespawned event)
 	{
-		if (!inTob || !inMaidenRegion())
+		if (!inTob)
 			return;
 
 		String npcName = event.getNpc().getName();
 		if (Objects.equals(npcName, "The Maiden of Sugadinti"))
 		{
-			if (maidenHandler.isMaidenActive())
+			if (maidenHandler.isBossActive())
+				maidenHandler.deactivate();
+		}
+		else if (Objects.equals(npcName, "Verzik Vitur"))
+		{
+			if (verzikHandler.isBossActive())
 				maidenHandler.deactivate();
 		}
 	}
@@ -233,31 +274,27 @@ public class PartyHitsPlugin extends Plugin
 		if (dmg > 0)
 		{
 			int projectileDelay = 0;
+
 			if (Objects.equals(actor.getName(), "The Maiden of Sugadinti"))
 			{
-				WorldPoint maidenLoc = actor.getWorldLocation();
-				int minDistance = 10;
-
-				for (int x = 0; x < 6; x++)
-				{
-					for (int y = 0; y < 6; y++)
-					{
-						WorldPoint tileLocation = new WorldPoint(maidenLoc.getX() + x, maidenLoc.getY() + y, maidenLoc.getPlane());
-						int distance = player.getWorldLocation().distanceTo(tileLocation);
-
-						if (distance < minDistance)
-						{
-							minDistance = distance;
-						}
-					}
-				}
-				projectileDelay = getTickDelay(minDistance);
+				projectileDelay = calcDelay(player, (NPC) actor, 6);
+			}
+			else if (VERZIK_P2_IDS.contains(npcId))
+			{
+				projectileDelay = calcDelay(player, (NPC) actor, 3);
+			}
+			else if (VERZIK_P3_IDS.contains(npcId))
+			{
+				projectileDelay = calcDelay(player, (NPC) actor, 7);
 			}
 
 			Hit hit = new Hit(dmg, player.getName(), projectileDelay);
 			sendHit(hit);
-			if (config.maidenHP() && !config.syncHits())
+
+			if (config.maidenHP() && !config.syncHits() && inMaidenRegion())
 				maidenHandler.queueDamage(hit, true);
+			if ((config.verzikHpP2() || config.verzikHpP3()) && !config.syncVerzikHits() && verzikHandler.isBossActive())
+				verzikHandler.queueDamage(hit, true);
 		}
 	}
 
@@ -274,6 +311,14 @@ public class PartyHitsPlugin extends Plugin
 			}
 		}
 
+		if ((config.verzikHpP2() || config.verzikHpP3()) && verzikHandler.isBossActive())
+		{
+			if (!isLocalPlayer || config.syncVerzikHits())
+			{
+				verzikHandler.queueDamage(hit, false);
+			}
+		}
+
 		if (config.partyHits() && !isLocalPlayer)
 		{
 			if (!config.maidenOnly() || inMaidenRegion())
@@ -281,6 +326,27 @@ public class PartyHitsPlugin extends Plugin
 				partyHitsOverlay.addHit(hit, config.duration());
 			}
 		}
+	}
+
+	private int calcDelay(Player player, NPC npc, int size)
+	{
+		WorldPoint npcLoc = npc.getWorldLocation();
+		int minDistance = 10;
+
+		for (int x = 0; x < size; x++)
+		{
+			for (int y = 0; y < size; y++)
+			{
+				WorldPoint tileLocation = new WorldPoint(npcLoc.getX() + x, npcLoc.getY() + y, npcLoc.getPlane());
+				int distance = player.getWorldLocation().distanceTo(tileLocation);
+
+				if (distance < minDistance)
+				{
+					minDistance = distance;
+				}
+			}
+		}
+		return getTickDelay(minDistance);
 	}
 
 	private int getTickDelay(int distance)

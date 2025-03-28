@@ -36,6 +36,14 @@ public interface PartyHitsConfig extends Config
 	)
 	String maidenSettings = "maidenSettings";
 
+	@ConfigSection(
+			name = "Verzik",
+			position = 3,
+			description = "Verzik Settings",
+			closedByDefault = true
+	)
+	String verzikSettings = "verzikSettings";
+
 	@ConfigItem(
 			position = 0,
 			keyName = "Duration",
@@ -235,6 +243,118 @@ public interface PartyHitsConfig extends Config
 			section = maidenSettings
 	)
 	default boolean onTickOnly()
+	{
+		return false;
+	}
+	@ConfigItem(
+			position = 18,
+			keyName = "Verzik Live HP P2",
+			name = "Verzik Live HP P2",
+			description = "Shows Verziks current hp on p2.",
+			section = verzikSettings
+	)
+	default boolean verzikHpP2()
+	{
+		return false;
+	}
+	@ConfigItem(
+			position = 19,
+			keyName = "Verzik Live HP P3",
+			name = "Verzik Live HP P3",
+			description = "Shows Verziks current hp on p3.",
+			section = verzikSettings
+	)
+	default boolean verzikHpP3()
+	{
+		return false;
+	}
+	@Range(min = -100, max = 100)
+	@ConfigItem(
+			position = 20,
+			keyName = "Verzik Height Offset",
+			name = "Verzik Height Offset",
+			description = "Make the Verzik HP higher.",
+			section = verzikSettings
+	)
+	default int verzikOffset()
+	{
+		return 30;
+	}
+	@Range(min = -100, max = 100)
+	@ConfigItem(
+			position = 21,
+			keyName = "Verzik Horizontal Offset",
+			name = "Verzik Horizontal Offset",
+			description = "Adjust the horizontal offset of the text on Verzik.",
+			section = verzikSettings
+	)
+	default int verzikHorOffset()
+	{
+		return -5;
+	}
+	@ConfigItem(
+			position = 22,
+			keyName = "Verzik Font",
+			name = "Verzik Font",
+			description = "Change the font of the HP on verzik.",
+			section = verzikSettings
+	)
+	default FontTypes verzikFont()
+	{
+		return FontTypes.ARIAL;
+	}
+	@ConfigItem(
+			position = 23,
+			keyName = "Verzik Font Size",
+			name = "Verzik Font Size",
+			description = "Change the size of the HP on Verzik.",
+			section = verzikSettings
+	)
+	default int verzikSize()
+	{
+		return 15;
+	}
+	@ConfigItem(
+			position = 24,
+			keyName = "Verzik Text Color",
+			name = "Verzik Text Color",
+			description = "Change the color of the text on Verzik.",
+			section = verzikSettings
+	)
+	default Color verzikColor()
+	{
+		return Color.GREEN;
+	}
+	@ConfigItem(
+			position = 25,
+			keyName = "Sync hits",
+			name = "Sync hits",
+			description = "Sync your hits with your teammates (delays your hits updating slightly)",
+			section = verzikSettings
+	)
+	default boolean syncVerzikHits()
+	{
+		return false;
+	}
+	@ConfigItem(
+			position = 26,
+			keyName = "Update Threshold",
+			name = "Update Threshold",
+			description = "Only update Verziks HP if change is more than x% from old hp",
+			section = verzikSettings
+	)
+	default double updateVerzikThreshold()
+	{
+		return 0.2;
+	}
+	@ConfigItem(
+			position = 27,
+			keyName = "Update on tick only",
+			name = "Update on tick only",
+			description = "Only update Verziks health every tick, instead of on xp drop",
+			section = verzikSettings
+	)
+	default boolean onTickOnlyVerzik()
 	{
 		return false;
 	}
