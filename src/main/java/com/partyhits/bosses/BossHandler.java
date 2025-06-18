@@ -7,6 +7,7 @@ import com.partyhits.util.Hit;
 import lombok.Getter;
 import net.runelite.api.*;
 import net.runelite.api.events.GameTick;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.ui.overlay.OverlayManager;
 import org.apache.commons.lang3.tuple.Pair;
@@ -21,6 +22,8 @@ public abstract class BossHandler
 {
     @Inject
     PartyHitsConfig config;
+    @Inject
+    private ClientThread clientThread;
     private BossOverlay bossOverlay;
     @Inject
     private OverlayManager overlayManager;
@@ -89,7 +92,7 @@ public abstract class BossHandler
 
     public void updatePredictedHp(int tick)
     {
-        if (bossNpc == null || bossNpc.isDead() || bossNpc.getHealthScale() == 0)
+        if (bossNpc == null || bossNpc.isDead())
         {
             return;
         }
@@ -107,8 +110,11 @@ public abstract class BossHandler
 
     private void updateHpPercentage()
     {
-        if (bossNpc.getHealthRatio() / bossNpc.getHealthScale() != 1)
-            realHpPercent = ((double) bossNpc.getHealthRatio() / (double) bossNpc.getHealthScale() * 100);
+        clientThread.invoke(() ->
+        {
+            if (bossNpc.getHealthRatio() / bossNpc.getHealthScale() != 1)
+                realHpPercent = ((double) bossNpc.getHealthRatio() / (double) bossNpc.getHealthScale() * 100);
+        });
     }
 
     public void queueDamage(Hit hit, boolean ownHit)
