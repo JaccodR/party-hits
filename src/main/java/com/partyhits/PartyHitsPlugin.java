@@ -4,6 +4,7 @@ import com.google.inject.Provides;
 import javax.inject.Inject;
 
 import com.partyhits.bosses.MaidenHandler;
+import com.partyhits.bosses.SoteHandler;
 import com.partyhits.bosses.VerzikHandler;
 import com.partyhits.util.Hit;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +54,8 @@ public class PartyHitsPlugin extends Plugin
 	@Inject
 	private VerzikHandler verzikHandler;
 	@Inject
+	private SoteHandler soteHandler;
+	@Inject
 	private EventBus eventBus;
 	private static final int[] previousExp = new int[Skill.values().length];
 	private final List<Integer> hitBuffer = new ArrayList<>();
@@ -96,6 +99,7 @@ public class PartyHitsPlugin extends Plugin
 		wsClient.registerMessage(Hit.class);
 		eventBus.register(maidenHandler);
 		eventBus.register(verzikHandler);
+		eventBus.register(soteHandler);
 		inTob = false;
 		if (client.getGameState() == GameState.LOGGED_IN)
 		{
@@ -118,10 +122,13 @@ public class PartyHitsPlugin extends Plugin
 			maidenHandler.deactivate();
 		if (verzikHandler.isBossActive())
 			verzikHandler.deactivate();
+		if (soteHandler.isBossActive())
+			soteHandler.deactivate();
 
 		overlayManager.remove(partyHitsOverlay);
 		eventBus.unregister(maidenHandler);
 		eventBus.unregister(verzikHandler);
+		eventBus.unregister(soteHandler);
 		wsClient.unregisterMessage(Hit.class);
 	}
 
@@ -137,6 +144,8 @@ public class PartyHitsPlugin extends Plugin
 				maidenHandler.deactivate();
 			if (!inTob && verzikHandler.isBossActive())
 				verzikHandler.deactivate();
+			if (!inTob && soteHandler.isBossActive())
+				soteHandler.deactivate();
 		}
 	}
 
@@ -170,6 +179,17 @@ public class PartyHitsPlugin extends Plugin
 				if (config.maidenHP())
 					maidenHandler.init(npc);
 				break;
+			case NpcID.SOTETSEG:
+			case NpcID.SOTETSEG_10865:
+			case NpcID.SOTETSEG_8388:
+				if (config.soteHp())
+					soteHandler.init(npc);
+				break;
+			//case NpcID.SOTETSEG_10868:
+			//case NpcID.SOTETSEG_10864:
+			//case NpcID.SOTETSEG_10867:
+			//case NpcID.SOTETSEG_11186:
+			//todo check if IDs are correct, and if they change after mazes...
 		}
 
 		if (VERZIK_P3_IDS.contains(npcId))
@@ -210,6 +230,11 @@ public class PartyHitsPlugin extends Plugin
 		{
 			if (verzikHandler.isBossActive())
 				verzikHandler.deactivate();
+		}
+		else if (Objects.equals(npcName, "Sotetseg"))
+		{
+			if (soteHandler.isBossActive())
+				soteHandler.deactivate();
 		}
 	}
 
@@ -287,6 +312,10 @@ public class PartyHitsPlugin extends Plugin
 			{
 				projectileDelay = calcDelay(player, (NPC) actor, 7);
 			}
+			else if (Objects.equals(actor.getName(), "Sotetseg"))
+			{
+				projectileDelay = calcDelay(player, (NPC) actor, 5);
+			}
 
 			Hit hit = new Hit(dmg, player.getName(), projectileDelay);
 			sendHit(hit);
@@ -295,6 +324,8 @@ public class PartyHitsPlugin extends Plugin
 				maidenHandler.queueDamage(hit, true);
 			if ((config.verzikHpP2() || config.verzikHpP3()) && !config.syncVerzikHits() && verzikHandler.isBossActive())
 				verzikHandler.queueDamage(hit, true);
+			if (config.soteHp() && !config.syncSoteHits() && soteHandler.isBossActive())
+				soteHandler.queueDamage(hit, true);
 		}
 	}
 
@@ -316,6 +347,14 @@ public class PartyHitsPlugin extends Plugin
 			if (!isLocalPlayer || config.syncVerzikHits())
 			{
 				verzikHandler.queueDamage(hit, false);
+			}
+		}
+
+		if (config.soteHp() && soteHandler.isBossActive())
+		{
+			if (!isLocalPlayer || config.syncSoteHits())
+			{
+				soteHandler.queueDamage(hit, false);
 			}
 		}
 

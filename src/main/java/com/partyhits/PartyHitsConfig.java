@@ -43,6 +43,13 @@ public interface PartyHitsConfig extends Config
 			closedByDefault = true
 	)
 	String verzikSettings = "verzikSettings";
+	@ConfigSection(
+			name = "Sotetseg",
+			position = 4,
+			description = "Sotetseg Settings",
+			closedByDefault = true
+	)
+	String soteSettings = "soteSettings";
 
 	@ConfigItem(
 			position = 0,
@@ -355,6 +362,107 @@ public interface PartyHitsConfig extends Config
 			section = verzikSettings
 	)
 	default boolean onTickOnlyVerzik()
+	{
+		return false;
+	}
+	@ConfigItem(
+			position = 28,
+			keyName = "Sote Live HP",
+			name = "Sote Live HP",
+			description = "Shows Sotetsegs current hp%",
+			section = soteSettings
+	)
+	default boolean soteHp()
+	{
+		return false;
+	}
+	@Range(min = -100, max = 100)
+	@ConfigItem(
+			position = 29,
+			keyName = "Sote Height Offset",
+			name = "Sote Height Offset",
+			description = "Make the Sote HP higher.",
+			section = soteSettings
+	)
+	default int soteOffset()
+	{
+		return 30;
+	}
+	@Range(min = -100, max = 100)
+	@ConfigItem(
+			position = 30,
+			keyName = "Sote Horizontal Offset",
+			name = "Sote Horizontal Offset",
+			description = "Adjust the horizontal offset of the text on Sote.",
+			section = soteSettings
+	)
+	default int soteHorOffset()
+	{
+		return -5;
+	}
+	@ConfigItem(
+			position = 31,
+			keyName = "Sote Font",
+			name = "Sote Font",
+			description = "Change the font of the HP on Sote.",
+			section = soteSettings
+	)
+	default FontTypes soteFont()
+	{
+		return FontTypes.ARIAL;
+	}
+	@ConfigItem(
+			position = 32,
+			keyName = "Sote Font Size",
+			name = "Sote Font Size",
+			description = "Change the size of the HP on Sote.",
+			section = soteSettings
+	)
+	default int soteSize()
+	{
+		return 15;
+	}
+	@ConfigItem(
+			position = 33,
+			keyName = "Sote Text Color",
+			name = "Sote Text Color",
+			description = "Change the color of the text on Sote.",
+			section = soteSettings
+	)
+	default Color soteColor()
+	{
+		return Color.GREEN;
+	}
+	@ConfigItem(
+			position = 34,
+			keyName = "Sync hits",
+			name = "Sync hits",
+			description = "Sync your hits with your teammates (delays your hits updating slightly)",
+			section = soteSettings
+	)
+	default boolean syncSoteHits()
+	{
+		return false;
+	}
+	@ConfigItem(
+			position = 35,
+			keyName = "Update Threshold",
+			name = "Update Threshold",
+			description = "Only update Sotes HP if change is more than x% from old hp",
+			section = soteSettings
+	)
+	default double updateSoteThreshold()
+	{
+		return 0.2;
+	}
+	@ConfigItem(
+			position = 36,
+			keyName = "Update on tick only",
+			name = "Update on tick only",
+			description = "Only update Sotes health every tick, instead of on xp drop",
+			section = soteSettings
+	)
+	default boolean onTickOnlySote()
 	{
 		return false;
 	}
