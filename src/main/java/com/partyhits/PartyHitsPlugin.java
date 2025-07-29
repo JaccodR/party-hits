@@ -171,6 +171,7 @@ public class PartyHitsPlugin extends Plugin
 
 		NPC npc = event.getNpc();
 		int npcId = npc.getId();
+
 		switch (npcId)
 		{
 			case NpcID.THE_MAIDEN_OF_SUGADINTI: // regular mode
@@ -179,23 +180,20 @@ public class PartyHitsPlugin extends Plugin
 				if (config.maidenHP())
 					maidenHandler.init(npc);
 				break;
-			case NpcID.SOTETSEG:
-			case NpcID.SOTETSEG_10865:
-			case NpcID.SOTETSEG_8388:
-				if (config.soteHp())
-					soteHandler.init(npc);
-				break;
-			//case NpcID.SOTETSEG_10868:
-			//case NpcID.SOTETSEG_10864:
-			//case NpcID.SOTETSEG_10867:
-			//case NpcID.SOTETSEG_11186:
-			//todo check if IDs are correct, and if they change after mazes...
 		}
 
 		if (VERZIK_P3_IDS.contains(npcId))
 		{
 			if (config.verzikHpP3())
 				verzikHandler.init(npc);
+		}
+
+		if (Objects.equals(npc.getName(), "Sotetseg"))
+		{
+			if (config.soteHp() && !soteHandler.isBossActive())
+			{
+				soteHandler.init(npc);
+			}
 		}
 	}
 
@@ -211,6 +209,13 @@ public class PartyHitsPlugin extends Plugin
 		{
 			if (config.verzikHpP2())
 				verzikHandler.init(npc);
+		}
+		if (npcId == NpcID.SOTETSEG_10865 || npcId == NpcID.SOTETSEG_8388 || npcId == NpcID.SOTETSEG_10868)
+		{
+			if (config.soteHp() && !soteHandler.isBossActive())
+			{
+				soteHandler.init(npc);
+			}
 		}
 	}
 
@@ -234,7 +239,7 @@ public class PartyHitsPlugin extends Plugin
 		else if (Objects.equals(npcName, "Sotetseg"))
 		{
 			if (soteHandler.isBossActive())
-				soteHandler.deactivate();
+				soteHandler.deactivate(); //todo only despawn if boss is dead; not in between phases
 		}
 	}
 

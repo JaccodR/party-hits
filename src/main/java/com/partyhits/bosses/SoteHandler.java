@@ -10,7 +10,7 @@ public class SoteHandler extends BossHandler
     protected int getMaxHp()
     {
         int partySize = xpToDamage.getToBPartySize();
-        boolean soteEM = getBossNpc().getId() == NpcID.SOTETSEG_10865;
+        boolean soteEM = getBossNpc().getId() == NpcID.SOTETSEG_10864;
 
         if (soteEM)
         {
